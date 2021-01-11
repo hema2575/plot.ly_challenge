@@ -1,20 +1,25 @@
-function getPlots(id) {
+function getPlots(inputid) {
     //Read samples.json
         d3.json("samples.json").then (sampledata =>{
-            console.log(sampledata)
-            var ids = sampledata.samples[0].otu_ids;
-            console.log(ids)
-            var sampleValues =  sampledata.samples[0].sample_values.slice(0,10).reverse();
-            console.log(sampleValues)
-            var labels =  sampledata.samples[0].otu_labels.slice(0,10);
-            console.log (labels)
+            // console.log(sampledata)
+            //filtering on samples
+            var sampleinfo = sampledata.samples
+            console.log(sampleinfo)
+            var filterdata = sampleinfo.filter(x => x.id === inputid)
+            console.log(filterdata)
+            // var OTU_id = filterdata[0].otu_ids;
+            // console.log(ids)
+            var sampleValues =  filterdata[0].sample_values.slice(0,10).reverse();
+            // console.log(sampleValues)
+            var labels =  filterdata[0].otu_labels.slice(0,10);
+            // console.log (labels)
         // get only top 10 otu ids for the plot OTU and reversing it. 
-            var OTU_top = ( sampledata.samples[0].otu_ids.slice(0, 10)).reverse();
+            var OTU_top = ( filterdata[0].otu_ids.slice(0, 10)).reverse();
         // get the otu id's to the desired form for the plot
             var OTU_id = OTU_top.map(d => "OTU " + d);
             console.log(`OTU IDS: ${OTU_id}`)
          // get the top 10 labels for the plot
-            var labels =  sampledata.samples[0].otu_labels.slice(0,10);
+            var labels = filterdata[0].otu_labels.slice(0,10);
             console.log(`OTU_labels: ${labels}`)
             var trace = {
                 x: sampleValues,
@@ -46,14 +51,14 @@ function getPlots(id) {
         Plotly.newPlot("bar", data, layout);
             // The bubble chart
             var trace1 = {
-                x: sampledata.samples[0].otu_ids,
-                y: sampledata.samples[0].sample_values,
+                x: filterdata[0].otu_ids,
+                y: filterdata[0].sample_values,
                 mode: "markers",
                 marker: {
-                    size: sampledata.samples[0].sample_values,
-                    color: sampledata.samples[0].otu_ids
+                    size: filterdata[0].sample_values,
+                    color: filterdata[0].otu_ids
                 },
-                text:  sampledata.samples[0].otu_labels
+                text:  filterdata[0].otu_labels
     
             };
     
@@ -79,7 +84,7 @@ function getPlots(id) {
     // get the metadata info for the demographic panel
             var metadata = data.metadata;
     
-            console.log(metadata)
+            // console.log(metadata)
     
           // filter meta data info by id
            var result = metadata.filter(meta => meta.id.toString() === id)[0];
@@ -96,9 +101,9 @@ function getPlots(id) {
         });
     }
     // create the function for the change event
-    function optionChanged(id) {
-        getPlots(id);
-        getDemoInfo(id);
+    function optionChanged(newid) {
+        getPlots(newid);
+        getDemoInfo(newid);
     }
     
     // create the function for the initial data rendering
